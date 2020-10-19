@@ -21,18 +21,19 @@ public class Inventario {
 		
 		int chunks = (int) Math.floor(registros.length /CHUNK_SIZE);
 		
+		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+		channel.queueDeclare(QUEUE_ERROR_NAME, false, false, false, null);
+		
         for(int c = 0; c<chunks; c++){
         	
         	String nRegistro [] = Arrays.copyOfRange(registros,c*CHUNK_SIZE, (c + 1)*CHUNK_SIZE);
         	
+			
         	for (int i = 0; i < nRegistro.length; i++) {
     			
         		System.out.println(nRegistro[i]);
         		try {
         			
-					channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-					channel.queueDeclare(QUEUE_ERROR_NAME, false, false, false, null);
-					
 	                channel.basicPublish("", QUEUE_NAME, null, nRegistro[i].getBytes());
 	                
 				} catch (IOException e) {
