@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+
+import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
 
 public class Inventario {
@@ -28,23 +30,18 @@ public class Inventario {
         	
         	String nRegistro [] = Arrays.copyOfRange(registros,c*CHUNK_SIZE, (c + 1)*CHUNK_SIZE);
         	
-			
-        	for (int i = 0; i < nRegistro.length; i++) {
+        	Gson gson = new Gson();
+        	String bloqueJson = gson.toJson(nRegistro);
+
+        	try {
     			
-        		System.out.println(nRegistro[i]);
-        		try {
-        			
-	                channel.basicPublish("", QUEUE_NAME, null, nRegistro[i].getBytes());
-	                
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					channel.basicPublish("", QUEUE_ERROR_NAME, null, nRegistro[i].getBytes());
-				}
+            	channel.basicPublish("", QUEUE_NAME, null, bloqueJson.getBytes());
                 
-    			
-    		}
-        	
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+            	channel.basicPublish("", QUEUE_ERROR_NAME, null, bloqueJson.getBytes());
+			}
         }
     }
 	
